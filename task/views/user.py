@@ -6,7 +6,9 @@ from task.models.user import User
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.views import APIView
-
+from rest_framework_simplejwt.views import TokenRefreshView
+from task.models.task import PushSubscription
+from rest_framework_simplejwt.exceptions import TokenError
 
 
 class UserRegisterView(generics.CreateAPIView):
@@ -47,3 +49,28 @@ class UserLoginView(APIView):
             return Response(response_data, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserTokenRefreshView(TokenRefreshView):
+    pass
+
+
+class UserLogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        refresh_token = request.data.get("refresh")
+
+        if not refresh_token:
+            return Response({"refresh": "Refresh token is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+
+        except TokenError:
+            return Response({"error": "Token is already blacklisted or invalid"}, status=status.HTTP_400_BAD_REQUEST)
+
+        PushSubscription.objects.filter(user=request.user).delete()
+
+        return Response({"message": "Logged out successfully"}, status=status.HTTP_200_OK)

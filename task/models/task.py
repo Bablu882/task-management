@@ -18,3 +18,12 @@ class UserTask(models.Model):
     deadline = models.DateField()
     completed_on = models.DateTimeField(null=True)
     status = models.CharField(choices=STATUS, max_length=10, default='pending')
+
+
+
+class PushSubscription(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="push_subscriptions")
+    endpoint = models.URLField()
+    auth_key = models.CharField(max_length=255)
+    p256dh_key = models.CharField(max_length=255)
+    created_on = models.DateTimeField(auto_now_add=True)

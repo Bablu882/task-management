@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from task.models.task import UserTask
+from task.models.task import UserTask, PushSubscription
 from task.models.user import User
 from task.utils import CustomDateTimeField
 from task.serializers.user import UserSerializer
@@ -22,8 +22,7 @@ class CompleteTaskSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def validate(self, data):
-        # Ensuring that the task can only be completed if assigned to the current user
-        task = self.instance  # The task instance we are updating
+        task = self.instance
         if task.assigned_to != self.context['request'].user:
             raise serializers.ValidationError("You cannot complete a task that is not assigned to you.")
         return data
@@ -39,4 +38,14 @@ class SearchUserTaskSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserTask
+        fields = '__all__'
+
+
+        
+class SubscriptionSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=False)
+    created_on = CustomDateTimeField(required=False)
+
+    class Meta:
+        model = PushSubscription
         fields = '__all__'

@@ -169,3 +169,9 @@ CHANNEL_LAYERS = {
         'BACKEND': 'channels.layers.InMemoryChannelLayer',
     }
 }
+
+
+#put here details from web browser provided by webpush by frontend team
+
+VAPID_PRIVATE_KEY = "9njnQYk7TT4ZOJ1TR296YA-OILP7r08jABGti4vQ"
+VAPID_EMAIL = "youremal@yopmail.com"
